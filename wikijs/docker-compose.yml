@@ -1,0 +1,29 @@
+version: "3"
+services:
+
+  db:
+    image: postgres:15-alpine
+    container_name: wikijs_db
+    env_file: .env
+    # logging:
+    #   driver: "none"
+    restart: unless-stopped
+    volumes:
+      - ./db:/var/lib/postgresql/data
+
+  wiki:
+    image: ghcr.io/requarks/wiki:2
+    container_name: wikijs_app
+    depends_on:
+      - db
+    env_file: .env
+    restart: unless-stopped
+    ports:
+      - "3004:3000"
+    volumes:
+      - ./config:/config
+      - ./data:/data
+networks:
+  default:
+    name: $DOCKER_MY_NETWORK
+    external: true
